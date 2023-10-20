@@ -4,7 +4,8 @@
 :Revision: version#
 :License: Public Domain
 
-= Project: Fuzzy-logic-with-arduino
+
+= Project: {Fuzzy-logic-with-arduino}
 This project uses Fuzzy Logic to determine water quality using readings from a Turbidity sensor and Electrical conductivity sensor
 == Step 1: Installation
 This code has been run and tested on  Arduino IDE and Arduino Uno R3
