@@ -1,19 +1,22 @@
-#include <Arduino.h>
 //fuzzy logic
 #include "fuzz.h"
+//gsm
 
+#include "gsm.h"
 //temperature
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define ONE_WIRE_BUS 4 //D4
+int ONE_WIRE_BUS =4; //D4
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 float get_temp()
 {
   sensors.requestTemperatures(); 
+  delay(100);
   float temp=sensors.getTempCByIndex(0);
+  temp=24.0;
   return temp;
 
 }
@@ -48,25 +51,45 @@ float get_ec ()
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27,16,2);  //sda A4, scl A5
 
+
+#define relay 9
+
+void stop_pump()
+{
+  digitalWrite(relay,HIGH);
+}
+void pump()
+{
+  digitalWrite(relay,LOW);
+}
+
 void setup() {
   // put your setup code here, to run once:
+  Serial.begin(9600);
   //initiating fuzzy logic
   fuzzy_logic_init();
   //initializing temperature sensor
   sensors.begin();
+
   //ec sensor
   ec.begin();
+  delay(100);
+
   //lcd 
   lcd.init(); //initialize the lcd
   lcd.backlight();
   lcd.setCursor(0,0);
   lcd.print("Water Quality");
-  delay(2000);
+  lcd.setCursor(0,1);
+  lcd.print("GROUP 3");
+  gsm_init();
+  delay(500);
   lcd.clear();
 
-  Serial.begin(9600);
-
-
+  //pins
+  pinMode(EC_PIN,INPUT);
+  pinMode(relay,OUTPUT);
+  digitalWrite(relay,HIGH);
 
 }
 
@@ -84,13 +107,36 @@ void loop() {
   Serial.print("EC: ");
   Serial.println(Ec);
 
-  float output= fuzzy_result(Tub,Ec);// tub ,ec respectively
+  float output= fuzzy_result(Tub,Ec,Temp);// tub ,ec respectively
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Output");
-  lcd.setCursor(0,0);
+  lcd.print("Fuzzy T Ec");
+  lcd.setCursor(0,1);
   lcd.print(output);
+  lcd.setCursor(5,1);
+  lcd.print(Tub);
+  lcd.setCursor(10,1);
+  lcd.print(Ec);
 
-  delay(2000);
+
+  if (output >50)
+{ 
+  
+  pump();
+  send_gsm(1);
+ 
+}
+else if(output>30 && output <50){
+  
+  pump();
+  send_gsm(2);
+
+  }
+else if (output<30)
+{
+    stop_pump();
+    send_gsm(3);
+
+}
 
 }

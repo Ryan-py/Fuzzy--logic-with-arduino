@@ -1,5 +1,4 @@
 
-
 # Project: {Fuzzy-logic-with-arduino}
 This project uses Fuzzy Logic to determine water quality using readings from a Turbidity sensor and Electrical conductivity sensor
 ## Step 1: Installation
@@ -16,6 +15,14 @@ Install the following libraries:
 Here is a circuit on proteus
 
 ![SVG image](./circuit.SVG)
+
+
+
+
+
+## Contributing
+To contribute to this project please contact: ryankiprotich42@gmail.com
+
 
 
 
